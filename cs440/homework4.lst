@@ -1,0 +1,185 @@
+SQL>-- 1
+SQL>select name from Company where ID in (
+  2  	     select C1 from Collaborators where C2 in (select ID from Company where lower(ceo) = 'gabriel'));
+NAME
+----------
+Acorn
+Tulip
+Peanut
+SSR
+Horn
+
+5 rows selected.
+
+SQL>
+SQL>-- 2
+SQL>select b.name, c.name, d.Field, e.Field from Suppliers a join Company b on(a.Supplier = b.ID) join Company c on(a.Purchaser = c.ID)
+  2  	     join Complexity d on (b.field = d.Field) join Complexity e on(c.field = e.Field)
+  3  	     where (d.rank - e.rank >= 2)
+  4  	     order by b.name, c.name;
+NAME       NAME       FIELD                FIELD
+---------- ---------- -------------------- --------------------
+Mint       Juniper    Database             Web
+
+1 row selected.
+
+SQL>
+SQL>-- 3
+SQL>select a.name A, b.name B, a.field "A Field", b.field "B Field" from Collaborators join Company a on(C1 = a.ID) join Company b on(C2 = b.ID)
+  2  	     where C1 < C2 order by A, B;
+A          B          A Field              B Field
+---------- ---------- -------------------- --------------------
+Acorn      Hemlock    iPhone               iPhone
+Blowtorch  FrenchFry  Web                  Web
+Blowtorch  SSR        Web                  Web
+Hemlock    Peanut     iPhone               iPhone
+Hemlock    SSR        iPhone               Web
+Horn       Gross      Desktop              Desktop
+Horn       Rocky      Desktop              Database
+Juniper    Blowtorch  Web                  Web
+Juniper    FrenchFry  Web                  Web
+Marathon   Rocky      Desktop              Database
+Marathon   SSR        Desktop              Web
+Mint       Tempty     Database             Database
+A          B          A Field              B Field
+---------- ---------- -------------------- --------------------
+Sycamore   Rocky      Database             Database
+Sycamore   SSR        Database             Web
+Sycamore   Tempty     Database             Database
+Tulip      Gross      Desktop              Desktop
+Tulip      Horn       Desktop              Desktop
+Tulip      Peanut     Desktop              iPhone
+Tulip      Walnut     Desktop              iPhone
+Walnut     Acorn      iPhone               iPhone
+
+20 rows selected.
+
+SQL>
+SQL>
+SQL>-- 4
+SQL>select name, field from Company where ID not in
+  2  	     (select Supplier from Suppliers union select Purchaser from Suppliers)
+  3  	     order by field, name;
+NAME       FIELD
+---------- --------------------
+Tempty     Database
+Acorn      iPhone
+Walnut     iPhone
+
+3 rows selected.
+
+SQL>
+SQL>
+SQL>-- 5
+SQL>select a.name, a.field, b.name, b.field
+  2  	     from Suppliers join Company a on(Suppliers.Supplier = a.ID)
+  3  	     join Company b on(Suppliers.Purchaser = b.ID)
+  4  	     where b.ID not in(select Supplier from Suppliers);
+NAME       FIELD                NAME       FIELD
+---------- -------------------- ---------- --------------------
+FrenchFry  Web                  Blowtorch  Web
+Tulip      Desktop              Blowtorch  Web
+Marathon   Desktop              Sycamore   Database
+Mint       Database             Juniper    Web
+
+4 rows selected.
+
+SQL>
+SQL>
+SQL>
+SQL>-- 6
+SQL>select field, name from Company  minus
+  2  	     (select a.field, a.name from Collaborators x join Company a on(C1 = a.ID) join Company b on(C2 = b.ID)
+  3  		     where a.field != b.field)
+  4  	     order by field, name;
+FIELD                NAME
+-------------------- ----------
+Database             Mint
+Database             Tempty
+Desktop              Gross
+Web                  Blowtorch
+Web                  FrenchFry
+Web                  Juniper
+iPhone               Acorn
+
+7 rows selected.
+
+SQL>
+SQL>
+SQL>-- !7
+SQL>select C1, C2 from Collaborators minus
+  2  	     select Purchaser, Supplier from Suppliers;
+        C1         C2
+---------- ----------
+      1025       1661
+      1101       1468
+      1101       1641
+      1247       1381
+      1247       1501
+      1247       1709
+      1304       1661
+      1304       1782
+      1304       1934
+      1316       1782
+      1316       1934
+      1381       1247
+        C1         C2
+---------- ----------
+      1381       1510
+      1468       1101
+      1468       1782
+      1501       1247
+      1501       1911
+      1510       1381
+      1510       1689
+      1641       1101
+      1641       1468
+      1661       1025
+      1661       1304
+      1689       1510
+        C1         C2
+---------- ----------
+      1689       1782
+      1709       1247
+      1782       1304
+      1782       1316
+      1782       1468
+      1782       1689
+      1911       1247
+      1911       1501
+      1934       1304
+      1934       1316
+
+34 rows selected.
+
+SQL>
+SQL>
+SQL>-- 8
+SQL>select count(distinct a.ID) - count(distinct b.ceo) from Company a, Company b;
+COUNT(DISTINCTA.ID)-COUNT(DISTINCTB.CEO)
+----------------------------------------
+                                       2
+
+1 row selected.
+
+SQL>
+SQL>-- 9
+SQL>select name, field from Company a where 2 <= (select count(*) from Suppliers where Purchaser = a.ID);
+NAME       FIELD
+---------- --------------------
+Peanut     iPhone
+Blowtorch  Web
+
+2 rows selected.
+
+SQL>
+SQL>-- 10
+SQL>select name, field from Company a where ID = (select max(C1) from Collaborators);
+NAME       FIELD
+---------- --------------------
+Rocky      Database
+
+1 row selected.
+
+SQL>
+SQL>spool off;

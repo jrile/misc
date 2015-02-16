@@ -1,0 +1,18 @@
+libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.2"
+compile
+help
+update
+reload
+eclipse-with-source=true
+eclipse-with-sources=true
+eclipse with-sources=true
+eclipse with-source=true
+eclipse
+compile
+exit
+compile
+eclipse
+exit
+reload
+eclipse
+exit

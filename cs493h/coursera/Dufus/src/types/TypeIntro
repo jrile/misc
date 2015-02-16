@@ -1,0 +1,32 @@
+
+  
+	Set --  a generic  aka  a "Type Constructor"
+	
+	
+	Set[Int]    Set[String]     --   parameterized type
+  
+	
+	Set[T]     Set[_]           --   Unlike java, scala does NOT allow raw types
+	
+	
+	
+	
+	Functional Queue
+	
+		head
+		tail
+		enqueue   --  Adds a new element -- at the end
+		
+		
+	Can we write an efficient functional queue?
+	
+	
+	scala> val q = Queue(1, 2, 3)
+		q: Queue[Int] = Queue(1, 2, 3)
+		
+	scala> val q1 = q enqueue 4
+		q1: Queue[Int] = Queue(1, 2, 3, 4)
+
+	scala> q
+		res0: Queue[Int] = Queue(1, 2, 3)
+

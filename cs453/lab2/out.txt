@@ -1,0 +1,23 @@
+Received from 127.0.0.1 ,PING 0 1366748117306
+
+Received from 127.0.0.1 ,PING 1 1366748117308
+
+Received from 127.0.0.1 ,PING 2 1366748117313
+
+Received from 127.0.0.1 ,PING 3 1366748117314
+
+Received from 127.0.0.1 ,PING 4 1366748117315
+
+Received from 127.0.0.1 ,PING 5 1366748117316
+
+Received from 127.0.0.1 ,PING 6 1366748117317
+
+Received from 127.0.0.1 ,PING 7 1366748117321
+
+Received from 127.0.0.1 ,PING 8 1366748117322
+
+Received from 127.0.0.1 ,PING 9 1366748117323
+
+Average RTT:	1
+Max RTT:	5 
+Min RTT:	1

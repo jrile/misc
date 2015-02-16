@@ -1,0 +1,191 @@
+SQL>
+SQL>/*
+SQL>Jonathan Rile
+SQL>CS 440
+SQL>Assignment 3
+SQL>February 3, 2013
+SQL>*/
+SQL>
+SQL>set echo on
+SQL>-- 1
+SQL>update emp set mgr = (select mgr from emp where ename = 'TURNER')
+  2  	     where ename = 'SCOTT';
+
+1 row updated.
+
+SQL>rollback;
+
+Rollback complete.
+
+
+
+SQL>
+SQL>-- 2
+SQL>insert into dept values(69, 'PR', 'Somewhere');
+
+1 row created.
+
+SQL>update emp set deptno = 69
+  2  	     where deptno = (select deptno from dept where lower(dname) = 'research');
+
+5 rows updated.
+
+SQL>rollback;
+
+Rollback complete.
+
+
+
+SQL>
+SQL>
+SQL>-- 3
+SQL>select ename from emp minus (
+  2  	     select ename from emp where mgr = (select mgr from emp where lower(ename) = 'martin'));
+
+
+
+
+
+ENAME
+----------
+ADAMS
+BLAKE
+CLARK
+FORD
+JONES
+KING
+MILLER
+SCOTT
+SMITH
+
+9 rows selected.
+
+SQL>
+SQL>-- 4
+SQL>break on sname
+SQL>select distinct sname, pname from (sp right join p using(p#)) right join s using(s#) order by sname;
+
+
+
+
+SNAME PNAME
+----- ----------
+adams hammer
+clark pliers
+      router
+      stapler
+henry
+jones pliers
+      stapler
+      wrench
+smith hammer
+      ladder
+      pliers
+      router
+
+
+SNAME PNAME
+----- ----------
+smith stapler
+      wrench
+
+14 rows selected.
+
+
+
+SQL>
+SQL>-- 5
+SQL>select distinct pname from sp join p using(p#) where s# in
+  2  	     (select s# from s join sp using(s#) join p using(p#) where lower(pname) = 'stapler')
+  3  	     and lower(pname) != 'stapler';
+
+
+
+PNAME
+----------
+router
+ladder
+hammer
+pliers
+wrench
+
+5 rows selected.
+
+SQL>
+SQL>
+SQL>-- 6
+SQL>select pname from p minus
+  2  	     select pname from s join sp using(s#) join p using(p#) where lower(s.city) = 'bonn';
+
+
+
+PNAME
+----------
+hammer
+ladder
+router
+
+3 rows selected.
+
+SQL>-- 7
+SQL>select sname from s
+  2  	     where 3 <= ( select count(distinct city) from sp join p using (p#) where s.s# = s#);
+
+
+
+SNAME
+-----
+smith
+jones
+clark
+
+3 rows selected.
+
+SQL>
+SQL>-- 8
+SQL>select distinct dname, avg(sal) from dept left join emp using(deptno) group by dname;
+
+
+
+DNAME            AVG(SAL)
+-------------- ----------
+RESEARCH             2175
+SALES          1566.66667
+OPERATIONS
+ACCOUNTING     2916.66667
+
+4 rows selected.
+
+SQL>
+SQL>
+SQL>-- 9
+SQL>select dname from dept where dname not in(
+  2  	     select dname from dept join emp using(deptno));
+
+
+
+DNAME
+--------------
+OPERATIONS
+
+1 row selected.
+
+SQL>
+SQL>-- 10 added "or sal is null" to account for departments with 0 employees.
+SQL>select dname, ename, sal from dept left join emp using(deptno)
+  2  	     where sal in (select max(sal) from emp group by deptno) or sal is null;
+
+
+
+DNAME          ENAME             SAL
+-------------- ---------- ----------
+ACCOUNTING     KING             5000
+RESEARCH       SCOTT            3000
+RESEARCH       FORD             3000
+SALES          BLAKE            2850
+OPERATIONS
+
+5 rows selected.
+
+SQL>
+SQL>spool off;

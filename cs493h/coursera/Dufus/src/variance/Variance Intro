@@ -1,0 +1,20 @@
+
+
+Is a Queue[String]  a subtype of Queue[Any] ?
+
+Is an ArrayList<String> a subtype of ArrayList<Object> ?
+
+Is a String[]  a subtype of Object[] ?
+
+
+
+
+
+
+covariant vs nonvariant vs contravariant
+
+
+
+LISKOV SUBSTITUTION PRINCIPAL
+it is safe to assume that a type T is a subtype of a type U if you can sub-
+stitute a value of type T wherever a value of type U is required.

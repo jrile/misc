@@ -1,0 +1,228 @@
+SQL>
+SQL>/*
+SQL>Jonathan Rile
+SQL>CS 440
+SQL>Assignment 2
+SQL>January 28, 2013
+SQL>*/
+SQL>
+SQL>
+SQL>set echo on
+SQL>-- 1
+SQL>
+SQL>alter table dept
+  2  /* 1A*/ modify deptno   constraint dept_pk primary key deferrable initially immediate
+  3  /* 1B*/ modify dname    constraint dname_uq unique deferrable initially immediate
+  4  			     constraint dname_nn not null deferrable initially immediate;
+
+Table altered.
+
+SQL>
+SQL>-- 2
+SQL>
+SQL>alter table emp
+  2  /* 2A*/ modify empno    constraint emp_pk primary key deferrable initially immediate
+  3  /* 2B*/ modify ename    constraint ename_uq unique deferrable initially immediate
+  4  			     constraint ename_nn not null deferrable initially immediate
+  5  /* 2C*/ modify mgr      constraint mgr_ref references emp(empno) deferrable initially immediate
+  6  /* 2D*/ modify deptno   constraint deptno_ref references dept(deptno) deferrable initially immediate
+  7  /* 2E*/ modify sal      constraint sal_chk check(sal between 500 and 10000) deferrable initially immediate;
+
+Table altered.
+
+SQL>
+SQL>-- 3
+SQL>
+SQL>alter table s
+  2  /* 3A*/ modify s#	     constraint s_pk primary key deferrable initially immediate
+  3  /* 3B*/ modify sname    constraint sname_uq unique deferrable initially immediate
+  4  			     constraint sname_nn not null deferrable initially immediate;
+
+Table altered.
+
+SQL>-- 4
+SQL>
+SQL>alter table p
+  2  /* 4A*/ modify p#	     constraint p_pk primary key deferrable initially immediate
+  3  /* 4B*/ modify pname    constraint pname_uq unique deferrable initially immediate
+  4  			     constraint pname_nn not null deferrable initially immediate;
+
+Table altered.
+
+SQL>
+SQL>-- 5
+SQL>
+SQL>alter table sp
+  2  /* 5A*/ add constraint sp_pk primary key (s#, p#) deferrable initially immediate
+  3  /* 5B*/ modify qty      constraint qty_nneg check(qty>0) deferrable initially immediate
+  4  /* 5C*/ modify s#	     constraint s_ref references s(s#) deferrable initially immediate
+  5  	     modify p#	     constraint p_ref references p(p#) deferrable initially immediate;
+
+Table altered.
+
+SQL>
+SQL>
+SQL>
+SQL>-- 6
+SQL>
+SQL>create index emp_deptno on emp(deptno);
+
+Index created.
+
+SQL>
+SQL>-- 7
+SQL>
+SQL>update emp set hiredate=(add_months(hiredate, -12)) where extract(YEAR from hiredate) > 2012;
+
+2 rows updated.
+
+SQL>commit;
+
+Commit complete.
+
+SQL>
+SQL>-- 8
+SQL>
+SQL>select table_name, index_name from all_indexes;
+TABLE_NAME                     INDEX_NAME
+------------------------------ ------------------------------
+XDB$ACL                        XDB$ACL_XIDX
+AUDIT_ACTIONS                  I_AUDIT_ACTIONS
+XDB$ACL                        XDB$ACL_SPIDX
+XDB$RESCONFIG                  SYS_C0041105
+XDB$ACL                        SYS_C0041104
+XDB$ELEMENT                    XDB$ELEMENT_GLOBAL
+XDB$ELEMENT                    XDB$ELEMENT_HER
+XDB$COMPLEX_TYPE               XDB$COMPLEX_TYPE_AK
+XDB$COMPLEX_TYPE               XDB$COMPLEX_TYPE_CK
+XDB$COMPLEX_TYPE               XDB$COMPLEX_TYPE_SK
+XDB$ELEMENT                    XDB$ELEMENT_TR
+XDB$ELEMENT                    XDB$ELEMENT_PR
+TABLE_NAME                     INDEX_NAME
+------------------------------ ------------------------------
+XDB$ELEMENT                    XDB$ELEMENT_PS
+XDB$SCHEMA                     XDB$SCHEMA_URL
+XDB$ELEMENT                    XDB$ELEMENT_PROPNAME
+XDB$ELEMENT                    XDB$ELEMENT_PROPNUMBER
+XDB$SCHEMA                     SYS_C0041099
+XDB$ATTRGROUP_REF              SYS_C0041098
+XDB$ATTRGROUP_DEF              SYS_C0041097
+XDB$GROUP_REF                  SYS_C0041096
+XDB$GROUP_DEF                  SYS_C0041095
+XDB$ANY                        SYS_C0041094
+XDB$ANYATTR                    SYS_C0041093
+XDB$ATTRIBUTE                  SYS_C0041092
+TABLE_NAME                     INDEX_NAME
+------------------------------ ------------------------------
+XDB$ELEMENT                    SYS_C0041091
+XDB$SEQUENCE_MODEL             SYS_C0041090
+XDB$CHOICE_MODEL               SYS_C0041089
+XDB$ALL_MODEL                  SYS_C0041088
+XDB$COMPLEX_TYPE               SYS_C0041087
+XDB$SIMPLE_TYPE                SYS_C0041086
+IMPDP_STATS                    IMPDP_STATS
+HS$_PARALLEL_METADATA          SYS_C0040934
+HS$_PARALLEL_METADATA          SYS_C0040933
+HS$_PARALLEL_METADATA          HS_PARALLEL_METADATA_PK
+HS_PARTITION_COL_TYPE          SYS_FK0000095265N00019$
+HS_PARTITION_COL_NAME          SYS_FK0000095265N00017$
+TABLE_NAME                     INDEX_NAME
+------------------------------ ------------------------------
+HELP                           HELP_TOPIC_SEQ
+EMP                            EMP_DEPTNO
+SP                             SP_PK
+P                              PNAME_UQ
+P                              P_PK
+S                              SNAME_UQ
+S                              S_PK
+EMP                            ENAME_UQ
+EMP                            EMP_PK
+DEPT                           DNAME_UQ
+DEPT                           DEPT_PK
+OL$HINTS                       OL$HNT_NUM
+TABLE_NAME                     INDEX_NAME
+------------------------------ ------------------------------
+OL$                            OL$SIGNATURE
+OL$                            OL$NAME
+STMT_AUDIT_OPTION_MAP          I_STMT_AUDIT_OPTION_MAP
+TABLE_PRIVILEGE_MAP            I_TABLE_PRIVILEGE_MAP
+SYSTEM_PRIVILEGE_MAP           I_SYSTEM_PRIVILEGE_MAP
+
+53 rows selected.
+
+SQL>
+SQL>-- 9
+SQL>
+SQL>select table_name, constraint_name from all_constraints;
+TABLE_NAME                     CONSTRAINT_NAME
+------------------------------ ------------------------------
+AUDIT_ACTIONS                  SYS_C00170875
+AUDIT_ACTIONS                  SYS_C00170874
+HS$_PARALLEL_METADATA          SYS_C0040931
+HS$_PARALLEL_METADATA          SYS_C0040930
+HS$_PARALLEL_METADATA          SYS_C0040929
+HS$_PARALLEL_METADATA          SYS_C0040928
+HS$_PARALLEL_METADATA          SYS_C0040927
+HS$_PARALLEL_METADATA          SYS_C0040926
+HS$_PARALLEL_METADATA          SYS_C0040925
+STMT_AUDIT_OPTION_MAP          SYS_C00607
+STMT_AUDIT_OPTION_MAP          SYS_C00606
+STMT_AUDIT_OPTION_MAP          SYS_C00605
+TABLE_NAME                     CONSTRAINT_NAME
+------------------------------ ------------------------------
+SYSTEM_PRIVILEGE_MAP           SYS_C00602
+SYSTEM_PRIVILEGE_MAP           SYS_C00601
+SYSTEM_PRIVILEGE_MAP           SYS_C00600
+TABLE_PRIVILEGE_MAP            SYS_C00604
+TABLE_PRIVILEGE_MAP            SYS_C00603
+HELP                           SYS_C002970
+HELP                           SYS_C002969
+DEPT                           DNAME_NN
+EMP                            SAL_CHK
+EMP                            ENAME_NN
+P                              PNAME_NN
+S                              SNAME_NN
+TABLE_NAME                     CONSTRAINT_NAME
+------------------------------ ------------------------------
+SP                             QTY_NNEG
+SP                             S_REF
+SP                             P_REF
+EMP                            MGR_REF
+EMP                            DEPTNO_REF
+HELP                           HELP_TOPIC_SEQ
+HS$_PARALLEL_METADATA          HS_PARALLEL_METADATA_PK
+HS$_PARALLEL_METADATA          SYS_C0040933
+HS$_PARALLEL_METADATA          SYS_C0040934
+XDB$SIMPLE_TYPE                SYS_C0041086
+XDB$COMPLEX_TYPE               SYS_C0041087
+XDB$ALL_MODEL                  SYS_C0041088
+TABLE_NAME                     CONSTRAINT_NAME
+------------------------------ ------------------------------
+XDB$CHOICE_MODEL               SYS_C0041089
+XDB$SEQUENCE_MODEL             SYS_C0041090
+XDB$ELEMENT                    SYS_C0041091
+XDB$ATTRIBUTE                  SYS_C0041092
+XDB$ANYATTR                    SYS_C0041093
+XDB$ANY                        SYS_C0041094
+XDB$GROUP_DEF                  SYS_C0041095
+XDB$GROUP_REF                  SYS_C0041096
+XDB$ATTRGROUP_DEF              SYS_C0041097
+XDB$ATTRGROUP_REF              SYS_C0041098
+XDB$SCHEMA                     SYS_C0041099
+XDB$ACL                        SYS_C0041104
+TABLE_NAME                     CONSTRAINT_NAME
+------------------------------ ------------------------------
+XDB$RESCONFIG                  SYS_C0041105
+DEPT                           DEPT_PK
+DEPT                           DNAME_UQ
+EMP                            EMP_PK
+EMP                            ENAME_UQ
+S                              S_PK
+S                              SNAME_UQ
+P                              P_PK
+P                              PNAME_UQ
+SP                             SP_PK
+
+58 rows selected.
+
+SQL>spool off;

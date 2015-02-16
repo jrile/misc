@@ -1,0 +1,160 @@
+SQL>/* Jonathan Rile
+SQL>CS 440 Homework 4
+SQL>Due Feb 11, 2013 */
+SQL>set echo on
+SQL>-- 1
+SQL>select name from Company where ID in (
+  2  	     select C1 from Collaborators where C2 in (select ID from Company where lower(ceo) = 'gabriel'));
+NAME
+----------
+Acorn
+Tulip
+Peanut
+SSR
+Horn
+
+5 rows selected.
+
+SQL>
+SQL>-- 2
+SQL>select b.name, c.name, d.Field, e.Field from Suppliers a join Company b on(a.Supplier = b.ID) join Company c on(a.Purchaser = c.ID)
+  2  	     join Complexity d on (b.field = d.Field) join Complexity e on(c.field = e.Field)
+  3  	     where (d.rank - e.rank >= 2)
+  4  	     order by b.name, c.name;
+NAME       NAME       FIELD                FIELD
+---------- ---------- -------------------- --------------------
+Mint       Juniper    Database             Web
+
+1 row selected.
+
+SQL>
+SQL>-- 3
+SQL>select a.name A, b.name B, a.field "A Field", b.field "B Field" from Collaborators join Company a on(C1 = a.ID) join Company b on(C2 = b.ID)
+  2  	     where a.name < b.name order by a.name, b.name;
+A          B          A Field              B Field
+---------- ---------- -------------------- --------------------
+Acorn      Hemlock    iPhone               iPhone
+Acorn      Walnut     iPhone               iPhone
+Blowtorch  FrenchFry  Web                  Web
+Blowtorch  Juniper    Web                  Web
+Blowtorch  SSR        Web                  Web
+FrenchFry  Juniper    Web                  Web
+Gross      Horn       Desktop              Desktop
+Gross      Tulip      Desktop              Desktop
+Hemlock    Peanut     iPhone               iPhone
+Hemlock    SSR        iPhone               Web
+Horn       Rocky      Desktop              Database
+Horn       Tulip      Desktop              Desktop
+A          B          A Field              B Field
+---------- ---------- -------------------- --------------------
+Marathon   Rocky      Desktop              Database
+Marathon   SSR        Desktop              Web
+Mint       Tempty     Database             Database
+Peanut     Tulip      iPhone               Desktop
+Rocky      Sycamore   Database             Database
+SSR        Sycamore   Web                  Database
+Sycamore   Tempty     Database             Database
+Tulip      Walnut     Desktop              iPhone
+
+20 rows selected.
+
+SQL>
+SQL>
+SQL>-- 4
+SQL>select name, field from Company where ID not in
+  2  	     (select Supplier from Suppliers union select Purchaser from Suppliers)
+  3  	     order by field, name;
+NAME       FIELD
+---------- --------------------
+Tempty     Database
+Acorn      iPhone
+Walnut     iPhone
+
+3 rows selected.
+
+SQL>
+SQL>
+SQL>-- 5
+SQL>select a.name, a.field, b.name, b.field
+  2  	     from Suppliers join Company a on(Suppliers.Supplier = a.ID)
+  3  	     join Company b on(Suppliers.Purchaser = b.ID)
+  4  	     where b.ID not in(select Supplier from Suppliers);
+NAME       FIELD                NAME       FIELD
+---------- -------------------- ---------- --------------------
+FrenchFry  Web                  Blowtorch  Web
+Tulip      Desktop              Blowtorch  Web
+Marathon   Desktop              Sycamore   Database
+Mint       Database             Juniper    Web
+
+4 rows selected.
+
+SQL>
+SQL>
+SQL>
+SQL>-- 6
+SQL>select field, name from Company  minus
+  2  	     (select a.field, a.name from Collaborators x join Company a on(C1 = a.ID) join Company b on(C2 = b.ID)
+  3  		     where a.field != b.field)
+  4  	     order by field, name;
+FIELD                NAME
+-------------------- ----------
+Database             Mint
+Database             Tempty
+Desktop              Gross
+Web                  Blowtorch
+Web                  FrenchFry
+Web                  Juniper
+iPhone               Acorn
+
+7 rows selected.
+
+SQL>
+SQL>
+SQL>-- !7
+SQL>with collab as(select * from Company join Collaborators on(ID = C1))
+  2  	     select a.name, b.name, c.name from
+  3  	     Suppliers join collab a on(a.ID = Supplier)
+  4  	     join collab b on(b.ID = Purchaser)
+  5  	     join Company c on c.ID = a.C2 and C.ID = b.C2
+  6  	     where((a.ID, b.ID) not in(select * from Collaborators));
+NAME       NAME       NAME
+---------- ---------- ----------
+Marathon   Sycamore   SSR
+Marathon   Sycamore   Rocky
+SSR        Peanut     Hemlock
+
+3 rows selected.
+
+SQL>
+SQL>-- 8
+SQL>select count(distinct a.ID) - count(distinct b.ceo) from Company a, Company b;
+COUNT(DISTINCTA.ID)-COUNT(DISTINCTB.CEO)
+----------------------------------------
+                                       2
+
+1 row selected.
+
+SQL>
+SQL>-- 9
+SQL>select name, field from Company a where 2 <= (select count(*) from Suppliers where Purchaser = a.ID);
+NAME       FIELD
+---------- --------------------
+Peanut     iPhone
+Blowtorch  Web
+
+2 rows selected.
+
+SQL>
+SQL>-- 10
+SQL>select name, field from Company join Collaborators on ID = C1
+  2  group by name, field
+  3  having count(*) >= all(select count(*) from Collaborators group by C1);
+NAME       FIELD
+---------- --------------------
+Tulip      Desktop
+SSR        Web
+
+2 rows selected.
+
+SQL>
+SQL>spool off;

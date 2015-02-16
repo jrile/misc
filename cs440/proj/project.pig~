@@ -1,0 +1,33 @@
+register file:/home/hadoop/lib/pig/piggybank.jar;
+DEFINE EXTRACT org.apache.pig.piggybank.evaluation.string.EXTRACT;
+
+-- get list of stations located in U.S. states
+raw_ish = LOAD 's3://cs440-climate/ISH-HISTORY.TXT' using TextLoader as (line:charray);
+ish_without_header = raw_ish generate 
+	flatten (
+		extract(line, '.{insertnumberofchars}(.*))
+	) 
+	as 
+		( ish:	chararray );
+
+/* or maybe ?
+ish_without_header = substring(raw_ish, [numofchars], [lastcharindoc]);
+*/
+
+ish_base = ish_without_header generate
+	extract(ish, '(\\d{6}) (\\d{5}) (\\w+)\\s+(\\w{2}) (\\w{2})    \\w{4}?  (\\+|\\-\\d{5}) (\\+|\\-\\d{6}) (\\+|\\-d{5})' 
+	as
+	(	usaf:	int,
+		wban:	int,
+		sname:	chararray,
+		ctry:	chararray,
+		state:	chararray,
+		lat:	chararray,
+		lon:	chararray,
+		elev:	chararray );
+
+ish_us_states = filter ish_base by (ctry = 'US') AND (state > 'A');
+	
+
+		
+		
